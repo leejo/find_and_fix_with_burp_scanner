@@ -1,0 +1,4 @@
+A demonstration of a typical vulnerability scanner against a modern and not so
+modern web app to demonstrate discovery of issues. We will use burp scanner for
+scanning, issues that it can discover, how to fix those. We will also briefly
+look at open source alternatives to Burp
