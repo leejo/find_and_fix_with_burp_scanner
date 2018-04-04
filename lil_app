@@ -1,0 +1,64 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+
+$ENV{MOJO_LOG_LEVEL} = 'debug';
+
+get '/' => sub {
+	my ( $c ) = @_;
+
+	return $c->render;
+};
+
+get '/login' => sub {
+	my ( $c ) = @_;
+
+	$c->stash( 'logged_in' => 0 );
+
+	if ( my $user = $c->param( "username" ) ) {
+		if ( my $password = $c->param( "password" ) ) {
+			if ( $password eq 'letmein' ) {
+				$c->stash( 'logged_in' => 1 );
+			}
+		}
+	}
+
+	return $c->render;
+};
+
+app->start;
+
+__DATA__
+@@ .html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<a href="/login">Login</a>
+	</body>
+</html>
+
+
+@@ login.html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<% if ( $logged_in ) { %>
+			Welcome!
+		<% } else { %>
+			<form action="/login">
+				Username: <input name="username" /><br />
+				Password: <input name="password" type="password" /><br />
+				<button name="submit" value="Login" title="Login" type="submit" >Login</button>
+			</form>
+		<% } %>
+	</body>
+</html>

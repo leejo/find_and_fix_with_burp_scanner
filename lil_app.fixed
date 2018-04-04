@@ -1,0 +1,83 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+
+$ENV{MOJO_LOG_LEVEL} = 'debug';
+
+get '/' => sub {
+	my ( $c ) = @_;
+
+	return $c->render;
+};
+
+any '/login' => sub {
+	my ( $c ) = @_;
+
+	$c->stash( 'logged_in' => 0 );
+
+	if ( my $user = $c->param( "username" ) ) {
+		if ( my $password = $c->param( "password" ) ) {
+			if ( $password eq 'letmein' ) {
+				$c->stash( 'logged_in' => 1 );
+			}
+		}
+	}
+
+	return $c->render;
+};
+
+hook 'after_dispatch' => sub {
+	my ( $c ) = @_;
+
+	# unless directed otherwise, browsers may store a local cached copy of content
+	# received from web servers. Some browsers, including Internet Explorer, cache
+	# content accessed via HTTPS. If sensitive information in application responses
+	# is stored in the local cache, then this may be retrieved by other users who
+	# have access to the same computer at a future time.
+	$c->res->headers->cache_control( 'no-store' );
+	$c->res->headers->header( Pragma => 'no-cache' );
+
+	# to effectively prevent framing attacks, the application should return a
+	# response header with the name X-Frame-Options and the value DENY to prevent
+	# framing altogether, or the value SAMEORIGIN to allow framing only by pages on
+	# the same origin as the response itself. Note that the SAMEORIGIN header can be
+	# partially bypassed if the application itself can be made to frame untrusted websites.
+	$c->res->headers->header( 'X-Frame-Options' => 'SAMEORIGIN' );
+};
+
+app->start;
+
+__DATA__
+@@ .html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<a href="/login">Login</a>
+	</body>
+</html>
+
+
+@@ login.html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<% if ( $logged_in ) { %>
+			Welcome!
+		<% } else { %>
+			<form action="/login" method="POST">
+				Username: <input name="username" /><br />
+				Password: <input name="password" type="password" autocomplete="off"/><br />
+				<button name="submit" value="Login" title="Login" type="submit" >Login</button>
+			</form>
+		<% } %>
+	</body>
+</html>
