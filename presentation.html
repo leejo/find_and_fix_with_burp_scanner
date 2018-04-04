@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Perl, Caching, and Memory Leaks</title>
+    <title>Find and Fix Your Web Security Vulnerabilities With Burp Scanner</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -28,26 +28,131 @@ Lee Johnson (LEEJO / leejo / lee@humanstate.com)
 
 ---
 
-## Title
+## Should you scan your app for vulnerabilities?
 
 --
-* ### Point 1
+
+* Is it public facing: Yes
 
 --
-* ### Point 2
+
+* Is it internal only: Yes
 
 --
-* ### Point 3
+
+* Is it a single use private app only accessible by you: Why not?
 
 ???
-Notes
+
+---
+
+## How often should you scan?
+
+* Anyone here who has a public facing app that has never been scanned?
+
+???
+If so, first thing you do when you get back is set this up!
+
+--
+
+* We get scanned externally once a year
+
+* And self scan at least twice a year
+
+--
+
+* Also scan on any major refactoring or major feature additions
+
+--
+
+* Automating this would be the end goal
+
+???
+Haven't got around to doing this yet, and perhaps not so much value as comprehensive scans take a long time (hours)
+
+---
+
+## OWASP (Open Web App Security Project) Top Ten 2017
+
+* Injection
+
+* Broken Authentication
+
+* Sensitive Data Exposure
+
+* XML External Entities (XXE)
+
+* Broken Access Control
+
+* Security Misconfiguration
+
+* Cross-Site Scripting (XSS)
+
+* Insecure Deserialization
+
+* Using Components with Known Vulnerabilities
+
+* Insufficient Logging & Monitoring
+
+???
+OWASP Top Ten was updated last year (2017), which was the first update in four years
+
+That's the ten most serious from about one hundred types of attack.
+
+---
+
+## Finding Vulnerabilities with Burp Scanner
+
+* Burp Suite is a commercial closed sourced product
+
+* Costs about €300 per single licence
+
+--
+
+* Comprehensive and configurable
+
+* Updated frequently
+
+--
+
+* Industry "standard"
+
+???
+When we've been externally scanned it's the one they use
+
+--
+
+* I have no affiliation with them, I just think it's a good product
+
+--
+
+* Open source alternatives are available, more on those later
+
+---
+
+## Live Demo!
 
 ---
 
 ## Alternatives to Burp Suite
 
-* https://github.com/sullo/nikto
+* https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project
+
+
+* https://github.com/andresriancho/w3af
+
+
+* https://github.com/Arachni/arachni
+
+
 * https://github.com/empijei/wapty
+    * "We are working to make wapty a worthy replacement for Burp, but we are not there yet"
+
+* https://github.com/sullo/nikto
+    * "Nikto is a web server assessment tool. It is designed to find various default and insecure files, configurations and programs on any type of web server."
+
+
+* And more...
 
 ---
 
@@ -56,6 +161,7 @@ Notes
 More info:
 
 * [Burp Suite](https://portswigger.net/burp)
+* [OWASP](https://www.owasp.org)
 
 ---
 
