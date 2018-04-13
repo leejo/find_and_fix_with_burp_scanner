@@ -155,11 +155,13 @@ When we've been externally scanned it's the one they use
 
 ---
 
-[OWASP ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project) (Zed Attack Proxy Project)
+#### [OWASP ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project) (Zed Attack Proxy Project)
 
 <img src="img/zap.png" width="750px" height="550px" />
 
 ???
+
+Java
 
 Seems very easy to use, not as configurable as Burp?
 
@@ -167,7 +169,7 @@ Trivial to install and run.
 
 ---
 
-[w3af](http://w3af.org/)
+#### [w3af](http://w3af.org/)
 
 Example script:
 
@@ -200,7 +202,7 @@ start
 
 ???
 
-Python 2 only
+Python (2 only)
 
 Couldn't get the GUI running due to way out of date deps
 
@@ -208,7 +210,7 @@ Console works OK though, and easily script-able using examples!
 
 ---
 
-[w3af](http://w3af.org/)
+#### [w3af](http://w3af.org/)
 
 <img src="img/w3af.png" width="100%" height="100%" />
 
@@ -229,7 +231,7 @@ Console works OK though, and easily script-able using examples!
 
 ---
 
-[Arachni](http://www.arachni-scanner.com/)
+#### [Arachni](http://www.arachni-scanner.com/)
 
 Simple scan:
 
@@ -239,7 +241,7 @@ Simple scan:
 
 ---
 
-[Arachni](http://www.arachni-scanner.com/)
+#### [Arachni](http://www.arachni-scanner.com/)
 
 Finds:
 
@@ -247,17 +249,90 @@ Finds:
 
 ???
 
+Ruby
+
 Doesn't support Loopback interfaces (just alias a host to 127.0.0.1 in /etc/hosts)
 
 Didn't find SQL injection points! Maybe it needs more configuration out of the box?
 
 ---
 
-* https://github.com/empijei/wapty
-    * "We are working to make wapty a worthy replacement for Burp, but we are not there yet"
+#### [Wapty](https://github.com/empijei/wapty)
 
-* https://github.com/sullo/nikto
-    * "Nikto is a web server assessment tool. It is designed to find various default and insecure files, configurations and programs on any type of web server."
+To install:
+
+```
+export GOPATH=/Users/leejohnson/go
+export PATH=$GOPATH/bin
+go get github.com/empijei/wapty
+cd $GOPATH/src/github.com/empijei/wapty
+make installdeps
+make
+make install
+wapty
+```
+
+<img src="img/wapty_1.png" width="100%" height="100%" />
+
+???
+
+Go
+
+I got this running, made sure to follow the instructions and use the proxy
+
+---
+
+#### [Wapty](https://github.com/empijei/wapty)
+
+<img src="img/wapty_2.png" width="100%" height="100%" />
+
+???
+
+But couldn't get it to do anything.
+
+Note there is no target tab?
+
+They do say that it's "not there yet", so one to watch i guess
+
+---
+
+#### [Nikto](https://github.com/sullo/nikto)
+
+```
+[leejohnson@lees-macbook-air J0 C824 15:34:32 master]
+*/Users/leejohnson/working/nikto/program > perl nikto.pl -h https://127.0.0.1:3000 -C all
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          127.0.0.1
++ Target Hostname:    127.0.0.1
++ Target Port:        3000
+---------------------------------------------------------------------------
++ SSL Info:        Subject:  ...
+                   Ciphers:  ...
+                   Issuer:   ...
++ Start Time:         2018-04-13 15:34:43 (GMT2)
+---------------------------------------------------------------------------
++ Server: Mojolicious (Perl)
++ The X-XSS-Protection header is not defined....
++ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.
++ The X-Content-Type-Options header is not set....
++ Hostname '127.0.0.1' does not match certificate's names: localhost
++ OSVDB-3092: /login/: This might be interesting...
++ /login.html: Admin login page/section found.
++ 26409 requests: 0 error(s) and 7 item(s) reported on remote host
++ End Time:           2018-04-13 15:37:46 (GMT2) (183 seconds)
+---------------------------------------------------------------------------
+```
+
+???
+
+Perl
+
+Pretty configurable
+
+Didn't find SQL injection points! Maybe it needs more configuration out of the box?
+
+False positives?
 
 ---
 
