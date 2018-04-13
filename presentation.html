@@ -138,7 +138,6 @@ When we've been externally scanned it's the one they use
 
 * https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project
 
-
 * https://github.com/andresriancho/w3af
 
 
@@ -156,14 +155,118 @@ When we've been externally scanned it's the one they use
 
 ---
 
+[OWASP ZAP](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project) (Zed Attack Proxy Project)
+
+<img src="img/zap.png" width="750px" height="550px" />
+
+???
+
+Seems very easy to use, not as configurable as Burp?
+
+Trivial to install and run.
+
+---
+
+[w3af](http://w3af.org/)
+
+Example script:
+
+```
+plugins
+output console,text_file
+output
+output config text_file
+set output_file output-w3af.txt
+set verbose True
+back
+output config console
+set verbose False
+back
+crawl all, !bing_spider, !google_spider, !spider_man
+crawl
+grep all
+grep
+audit all
+audit
+bruteforce all
+bruteforce
+back
+target
+set target https://127.0.0.1:3000/
+back
+
+start
+```
+
+???
+
+Python 2 only
+
+Couldn't get the GUI running due to way out of date deps
+
+Console works OK though, and easily script-able using examples!
+
+---
+
+[w3af](http://w3af.org/)
+
+<img src="img/w3af.png" width="100%" height="100%" />
+
+```
+[leejohnson@lees-macbook-air J0 C725 14:25:11 master]
+/Users/leejohnson/working/w3af > fgrep 'Blind' output-w3af.txt
+[Fri Apr 13 14:19:23 2018 - vulnerability] Blind SQL injection was found at:
+	"https://127.0.0.1:3000/login", using HTTP method POST. The injectable
+	parameter is: "password". This vulnerability was found in the requests
+	with ids 19371 and 19382.
+
+[leejohnson@lees-macbook-air J0 C726 14:25:32 master]
+/Users/leejohnson/working/w3af > fgrep 19371 !$
+[Fri Apr 13 14:19:22 2018 - debug] POST https://127.0.0.1:3000/login with data:
+	"username=John8212&password=46' OR '46'='46' OR '46'='46..." returned HTTP
+	code "200" (id=19371,from_cache=0,grep=0,rtt=0.06,did=2kNq5UfD)
+```
+
+---
+
+[Arachni](http://www.arachni-scanner.com/)
+
+Simple scan:
+
+```
+./bin/arachni https://lil_app.com:3000/
+```
+
+---
+
+[Arachni](http://www.arachni-scanner.com/)
+
+Finds:
+
+<img src="img/arachni.png" width="100%" height="100%" />
+
+???
+
+Doesn't support Loopback interfaces (just alias a host to 127.0.0.1 in /etc/hosts)
+
+Didn't find SQL injection points! Maybe it needs more configuration out of the box?
+
+---
+
+* https://github.com/empijei/wapty
+    * "We are working to make wapty a worthy replacement for Burp, but we are not there yet"
+
+* https://github.com/sullo/nikto
+    * "Nikto is a web server assessment tool. It is designed to find various default and insecure files, configurations and programs on any type of web server."
+
+---
+
 ## Questions?
 
 More info:
 
 * [Burp Suite](https://portswigger.net/burp)
 * [OWASP](https://www.owasp.org)
-
----
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
