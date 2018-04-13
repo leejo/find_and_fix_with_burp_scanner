@@ -300,7 +300,7 @@ They do say that it's "not there yet", so one to watch i guess
 
 ```
 [leejohnson@lees-macbook-air J0 C824 15:34:32 master]
-*/Users/leejohnson/working/nikto/program > perl nikto.pl -h https://127.0.0.1:3000 -C all
+/Users/leejohnson/working/nikto/program > perl nikto.pl -h https://127.0.0.1:3000 -C all
 - Nikto v2.1.6
 ---------------------------------------------------------------------------
 + Target IP:          127.0.0.1
@@ -313,9 +313,9 @@ They do say that it's "not there yet", so one to watch i guess
 + Start Time:         2018-04-13 15:34:43 (GMT2)
 ---------------------------------------------------------------------------
 + Server: Mojolicious (Perl)
-+ The X-XSS-Protection header is not defined....
-+ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.
-+ The X-Content-Type-Options header is not set....
+*+ The X-XSS-Protection header is not defined....
+*+ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.
+*+ The X-Content-Type-Options header is not set....
 + Hostname '127.0.0.1' does not match certificate's names: localhost
 + OSVDB-3092: /login/: This might be interesting...
 + /login.html: Admin login page/section found.
@@ -342,6 +342,7 @@ More info:
 
 * [Burp Suite](https://portswigger.net/burp)
 * [OWASP](https://www.owasp.org)
+* [OWASP 2017 Top Ten](https://www.owasp.org/index.php/Category:OWASP_Top_Ten_2017_Project)
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
