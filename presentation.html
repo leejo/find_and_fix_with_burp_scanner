@@ -74,28 +74,79 @@ Haven't got around to doing this yet, and perhaps not so much value as comprehen
 
 ## OWASP (Open Web App Security Project) Top Ten 2017
 
+???
+
+OWASP Top Ten was updated last year (2017), which was the first update in four years
+
+--
+
 * Injection
+
+--
 
 * Broken Authentication
 
+???
+
+Permitting weak passwords, allowing brute force attacks, not hashing + salting passwords, not invalidating sessions, etc
+
+--
+
 * Sensitive Data Exposure
+
+???
+
+Not using HTTPS, using  weak cryptographic algorithms
+
+--
 
 * XML External Entities (XXE)
 
+???
+
+Not sanitising external references (we might see this in JSON-Schema soon?). Typical DOS attack example below
+
+--
+
+```
+<!ENTITY xxe SYSTEM "file:///dev/random" >]>
+```
+
+--
+
 * Broken Access Control
+
+???
+
+User manipulates URLs to get access: primary keys in URL, JWTs, etc
+
+--
 
 * Security Misconfiguration
 
+???
+
+Unnecessary ports open, OOTB default accounts enabled, deps not up to date or patched, etc
+
+--
+
 * Cross-Site Scripting (XSS)
+
+--
 
 * Insecure Deserialization
 
+--
+
 * Using Components with Known Vulnerabilities
+
+--
 
 * Insufficient Logging & Monitoring
 
 ???
-OWASP Top Ten was updated last year (2017), which was the first update in four years
+
+Not knowing you've been hacked - audit failed logins, checks warnings, etc
 
 That's the ten most serious from about one hundred types of attack.
 
