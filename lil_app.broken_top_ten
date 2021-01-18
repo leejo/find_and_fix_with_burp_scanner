@@ -1,0 +1,206 @@
+#!perl
+
+# this is an app the tries to demonstrate the OWASP top ten vulnerabilities
+# they are commented inline. please don't take the code here as good
+# practice, it is anything but and *intentionally* full of vulnerabilities
+# to demo them. i take no responsibility if you use this code in your
+# production environment and then get p0wned. you can find the various
+# vulnerabilities by searching for OWASP
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite -signatures;
+use Try::Tiny::SmartCatch;
+use XML::LibXML;
+use DBI;
+
+$ENV{MOJO_LOG_LEVEL} = 'debug';
+
+#
+# helpers
+# 
+helper logged_in_user => sub ( $c ) {
+	return $c->session->{username} || 0;
+};
+
+helper get_user => sub ( $c,$username ) {
+
+	my $dbh = DBI->connect(
+		"dbi:SQLite:dbname=lil_app.sqlite3","","",
+		{
+			PrintError          => 0,
+			AutoCommit          => 1,
+			AutoInactiveDestroy => 1,
+			RaiseError          => 1,
+		}
+	) or die( "unable to create db: $DBI::errstr\n" );
+
+	# OWASP 1. SQL Injection - we should be using bind variable here
+	# as users could inject SQL into the query here and cause all
+	# sorts of damage
+	return $dbh->selectrow_array( "
+		SELECT username, password, mobile FROM users
+		WHERE username = '$username'
+	" );
+};
+
+#
+# routes
+#
+get '/' => sub ( $c ) {
+	return $c->render;
+};
+
+get '/exception' => sub ( $c ) {
+
+	# OWASP 3. Sensitive Data Exposure - running this under morbo
+	# will reveal lots of internal details about the app, which
+	# could be used to attack the app or reverse engineer it
+	$c->reply->exception;
+};
+
+any '/login' => sub ( $c ) {
+
+	my $username = $c->param( "username" ) || '';
+	my $password = $c->param( "password" ) || '';
+
+	$c->stash( username => $username );
+	$c->stash( error    => undef );
+
+	try sub {
+		my ( $db_username,$db_password ) = $c->get_user( $username );
+
+		if ( $db_username ) {
+
+			if ( $db_password eq $password ) {
+
+				$c->session(
+					logged_in => 1,
+					username  => $username,
+				);
+
+				$c->redirect_to( '/' );
+
+			} else {
+				# OWASP 2. Broken Authentication - we are revealing that the
+				# user exists, so now only the password needs to be figured out
+				$c->stash( 'error' => "incorrect password" );
+			}
+
+		} elsif ( $username ) {
+			# OWASP 7. XSS (reflected) - the template needs to use the <%= tags rather
+			# than the <%== tags to ensure the interpolated variables are encoded
+			$c->stash( 'error' => "$username not found" );
+		}
+
+	},
+	catch_default sub {
+
+		chomp( my $e = $_ );
+		app->log->error( $e );
+
+		# OWASP 3. Sensitive Data Exposure - we are sticking an error in
+		# the stash here, which could reveal details of the internal
+		# implementation that could be used to further attack the app.
+		# we should probably catch certain exceptions to decide on how
+		# we will report them back to the user
+		$c->stash( error => $e );
+	};
+
+	return $c->render;
+};
+
+post '/soap' => sub ( $c ) {
+
+	my $xml = $c->req->body;
+	my $dom = XML::LibXML->load_xml(
+		string          => $xml,
+		# OWASP 4. XML External Entities - XML that references external entities
+		# needs sanitising and/or whitelisting. here we have the expand_entities
+		# set to true, overriding the default, and thus opening the exploit
+		expand_entities => 1,
+	);
+
+	$c->render(
+		format => 'xml',
+		text   => $dom->toString,
+	);
+};
+
+get '/mobile/:username' => sub ( $c ) {
+
+	my $logged_in_username = $c->logged_in_user;
+
+	# OWASP 5. Broken Access Control - only super users and the user the
+	# settings relate to should be able to access the settings
+	my ( undef,undef,$mobile ) = $c->get_user( $c->param( 'username' ) );
+
+	$c->render( text => $mobile );
+};
+
+get '/logout' => sub ( $c ) {
+
+	$c->session( expires => 1 );
+	$c->redirect_to( '/' );
+};
+
+#
+# hooks
+#
+hook 'after_dispatch' => sub {
+	my ( $c ) = @_;
+
+	# OWASP 6. Security Misconfiguration - misconfigured HTTP headers and
+	# poor defaults can lead to insecure transport
+	$c->res->headers->cache_control( 'no-store' );
+	$c->res->headers->header( Pragma => 'no-cache' );
+	$c->res->headers->header( 'X-Frame-Options' => 'SAMEORIGIN' );
+};
+
+# OWASP 6. Security Misconfiguration - default configurations
+# app->secrets( ['some sort of secure phrase'] );
+
+#
+# startup the app
+#
+app->start;
+
+#
+# templates
+#
+__DATA__
+@@ .html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<% if ( my $username = $c->session->{username} ) { %>
+			Welcome <%= $username %>!
+		<% } else { %>
+			<a href="/login">Login</a>
+		<% } %>
+	</body>
+</html>
+
+
+@@ login.html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+	</head>
+	<body>
+		<form action="/login" method="POST">
+			Username: <input name="username" /><br />
+			Password: <input name="password" type="password" autocomplete="off"/><br />
+			<button name="submit" value="Login" title="Login" type="submit" >Login</button>
+		</form>
+
+		<% if ( $error ) { %>
+			<%== $error %>!
+		<% } %>
+	</body>
+</html>
