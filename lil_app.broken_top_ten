@@ -41,8 +41,8 @@ helper get_user => sub ( $c,$username ) {
 	# sorts of damage
 	return $dbh->selectrow_array( "
 		SELECT username, password, mobile FROM users
-		WHERE username = '$username'
-	" );
+		WHERE username = ?
+	",undef,$username );
 };
 
 #
@@ -57,7 +57,7 @@ get '/exception' => sub ( $c ) {
 	# OWASP 3. Sensitive Data Exposure - running this under morbo
 	# will reveal lots of internal details about the app, which
 	# could be used to attack the app or reverse engineer it
-	$c->reply->exception;
+	$c->render( text => "Exception!" );
 };
 
 any '/login' => sub ( $c ) {
@@ -85,13 +85,13 @@ any '/login' => sub ( $c ) {
 			} else {
 				# OWASP 2. Broken Authentication - we are revealing that the
 				# user exists, so now only the password needs to be figured out
-				$c->stash( 'error' => "incorrect password" );
+				$c->stash( 'error' => "There was a problem with your login details: \"$username\"" );
 			}
 
 		} elsif ( $username ) {
 			# OWASP 7. XSS (reflected) - the template needs to use the <%= tags rather
 			# than the <%== tags to ensure the interpolated variables are encoded
-			$c->stash( 'error' => "$username not found" );
+			$c->stash( 'error' => "There was a problem with your login \"$username\"" );
 		}
 
 	},
@@ -105,7 +105,7 @@ any '/login' => sub ( $c ) {
 		# implementation that could be used to further attack the app.
 		# we should probably catch certain exceptions to decide on how
 		# we will report them back to the user
-		$c->stash( error => $e );
+		$c->stash( error => "There was a problem with your login details: \"$username\"" );
 	};
 
 	return $c->render;
@@ -119,7 +119,7 @@ post '/soap' => sub ( $c ) {
 		# OWASP 4. XML External Entities - XML that references external entities
 		# needs sanitising and/or whitelisting. here we have the expand_entities
 		# set to true, overriding the default, and thus opening the exploit
-		expand_entities => 1,
+		expand_entities => 0,
 	);
 
 	$c->render(
@@ -131,6 +131,9 @@ post '/soap' => sub ( $c ) {
 get '/mobile/:username' => sub ( $c ) {
 
 	my $logged_in_username = $c->logged_in_user;
+
+	$c->reply->not_found
+		if $logged_in_username ne $c->param( 'username' );
 
 	# OWASP 5. Broken Access Control - only super users and the user the
 	# settings relate to should be able to access the settings
@@ -159,7 +162,7 @@ hook 'after_dispatch' => sub {
 };
 
 # OWASP 6. Security Misconfiguration - default configurations
-# app->secrets( ['some sort of secure phrase'] );
+app->secrets( ['some sort of secure phrase'] );
 
 #
 # startup the app
@@ -200,7 +203,7 @@ __DATA__
 		</form>
 
 		<% if ( $error ) { %>
-			<%== $error %>!
+			<%= $error %>!
 		<% } %>
 	</body>
 </html>
